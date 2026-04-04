@@ -1,0 +1,30 @@
+node: Discretionary
+canonical_id: "ft.expenditure.discretionary"
+question: "Is this a lifestyle choice — spending that could be reduced or eliminated without impacting basic needs?"
+criteria:
+  includes:
+    - "Restaurant meals and dining out"
+    - "Fashion and retail shopping"
+    - "Online shopping (non-essential)"
+    - "Entertainment, leisure, cultural activities"
+    - "Travel and accommodation"
+  excludes:
+    - "Contractual obligations"
+    - "Essential groceries and household supplies"
+    - "Health-related spending"
+    - "Commute-related transport"
+  edge_cases:
+    - term: "Fast food (McDonalds)"
+      resolution: "Included — discretionary even if routine; not a nutritional necessity"
+      decided: true
+    - term: "Eurest corporate canteen"
+      resolution: "Included — could bring lunch from home; dining choice"
+      decided: true
+parent: Expenditure
+children:
+  - dining_out
+  - shopping_fashion
+  - shopping_online_general
+  - entertainment_leisure
+  - travel_accommodation
+version: 1.0.0

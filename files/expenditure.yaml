@@ -1,0 +1,27 @@
+node: Expenditure
+canonical_id: "ft.expenditure"
+question: "Is money flowing out of the account?"
+criteria:
+  includes:
+    - "Any debit, card payment, direct debit, standing order, or cash withdrawal"
+  excludes:
+    - "Incoming payments"
+parent: Financial Transaction
+children:
+  - fixed_obligations
+  - variable_necessities
+  - discretionary
+  - personal_transfers
+  - cash_withdrawals
+version: 1.0.0
+decision_record:
+  criterion_chosen: "Degree of obligation — how controllable is this spending?"
+  alternatives_considered:
+    - "Merchant type (where did I spend?)"
+    - "Payment method (card vs. transfer vs. cash)"
+    - "Amount range"
+  reason: >
+    In a personal budgeting context, the most actionable split
+    is controllability. Fixed obligations are locked in; variable
+    necessities can be optimized; discretionary can be cut. This
+    maps directly to how a person can act on their budget.

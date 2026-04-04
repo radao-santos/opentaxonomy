@@ -1,0 +1,28 @@
+node: Dining Out
+canonical_id: "ft.expenditure.discretionary.dining"
+question: "Is this a payment at a restaurant, cafe, bar, or food service establishment?"
+criteria:
+  includes:
+    - "Full-service restaurants"
+    - "Fast food chains (McDonalds, Five Guys, etc.)"
+    - "Cafes and coffee shops (Starbucks, etc.)"
+    - "Bars and beer gardens"
+    - "Takeaway/delivery services (Lieferando, Takeaway.com)"
+    - "Corporate canteens (Eurest)"
+    - "Bakery cafes when dining in"
+  excludes:
+    - "Supermarket food purchases"
+    - "Grocery delivery services"
+  edge_cases:
+    - term: "Bakery (Baeckerei und Konditorei)"
+      resolution: "Included — the purchase is prepared food for immediate consumption"
+      decided: true
+    - term: "Food Affairs GmbH"
+      resolution: "Included — appears to be a food service/catering entity"
+      decided: true
+    - term: "Airport food (Relay, Exki, Gru Fridays)"
+      resolution: "Included — dining out regardless of location"
+      decided: true
+parent: Discretionary
+children: []
+version: 1.0.0

@@ -1,0 +1,167 @@
+# ============================================================
+# PRIMA SEED — The Universal Questioning Protocol
+# OpenTaxonomy v0.1.0
+# ============================================================
+# The Prima Seed is not a taxonomy. It is a meta-protocol —
+# a dialectical engine that, when applied to raw data,
+# generates domain-specific seeds and taxonomic trees.
+# ============================================================
+
+seed_id: prima-seed
+version: 1.0.0
+type: universal
+description: >
+  The first principle (ἀρχή) of OpenTaxonomy. A domain-agnostic
+  questioning protocol that generates domain-specific taxonomic
+  trees from raw categorical data. Inspired by Plato's Divided
+  Line — ascending from sense data to intelligible forms through
+  dialectical questioning.
+
+# ============================================================
+# PRE-DIALECTICAL PHASE
+# ============================================================
+# Before the questioning begins, raw data must be normalized.
+# This is Step 0 — reducing noise to signal.
+
+step_0_normalization:
+  description: >
+    Deduplicate and normalize raw values before entering the
+    dialectic. The tree works on meaning, not on strings.
+  operations:
+    - resolve_encoding_errors: true
+    - merge_spelling_variants: true
+    - strip_metadata: true  # dates, amounts, reference numbers
+    - extract_entity_names: true  # from verbose transaction strings, etc.
+    - flag_unresolvable: true  # values that cannot be normalized
+
+# ============================================================
+# DIALECTICAL PHASE — The Questioning Protocol
+# ============================================================
+
+questions:
+
+  Q0:
+    name: form_recognition
+    prompt: "What is the shared nature of these values?"
+    purpose: >
+      Identify the Form (εἶδος) — the highest-level category
+      that unifies all values in the dataset. This names the
+      root node of the tree.
+    input: entire_list
+    output: root_node_label
+    runs: once
+
+  Q0b:
+    name: context_establishment
+    prompt: "In what operational context does this data exist?"
+    purpose: >
+      Establish the realm in which these values live and are
+      organized. The context governs all subsequent criteria —
+      the same data in different contexts produces different
+      trees. A list of animals in a biology lab splits by
+      phylogeny; the same list in a pet store splits by care
+      requirements.
+    input: root_node_label + entire_list
+    output: context_declaration
+    runs: once
+
+  Q1:
+    name: primary_differentiation
+    prompt: >
+      Within this context, what is the most essential criterion
+      that divides these into groups?
+    purpose: >
+      Find the first vertical split — the most fundamental
+      dimension that creates horizontal branches at level 1.
+    input: entire_list + context_declaration
+    output: level_1_branches
+    runs: once
+
+  Q2:
+    name: recursive_differentiation
+    prompt: >
+      For each group, what is the next most essential criterion
+      within this context?
+    purpose: >
+      Deepen the tree. Applied recursively per branch at each
+      level. Each application creates the next vertical layer
+      and its horizontal branches.
+    input: branch_members + context_declaration
+    output: sub_branches
+    runs: once_per_branch_per_level
+
+  Q3:
+    name: dialectical_check
+    prompt: >
+      Are there values that resist placement? What do they
+      reveal about the criteria above?
+    purpose: >
+      The ascent. Values that don't fit expose flawed criteria
+      at higher levels. This triggers restructuring — branches
+      may merge, split, or change their criteria. This is
+      Agrippa's Trilemma in action: the system must eventually
+      stipulate rather than infinitely regress.
+    input: unplaced_values + current_tree
+    output: restructured_tree OR edge_case_records
+    runs: after_each_level_completion
+
+# ============================================================
+# HALT CONDITION
+# ============================================================
+
+halt_condition:
+  description: >
+    The dialectic stops when all three conditions are met.
+    If a value cannot be placed, it is flagged as unresolved —
+    input for the next seed version.
+  conditions:
+    - full_placement: "Every distinct value is assigned to a leaf node"
+    - structural_stability: "A full pass produces zero restructuring above leaf level"
+    - seed_exhaustion: "All seed questions have been applied at maximum depth"
+  unresolved_values:
+    description: >
+      Values that cannot be placed after all questions are
+      exhausted. These are the platypuses — they drive
+      ontological progress and become input for the next
+      version of the seed.
+    action: flag_and_record
+
+# ============================================================
+# OUTPUT SPECIFICATION
+# ============================================================
+
+output:
+  format: yaml
+  structure: one_file_per_node
+  node_schema:
+    required_fields:
+      - node: "Label for this node"
+      - question: "The question that, answered 'yes', places data here"
+      - criteria:
+          includes: "List of inclusion criteria (natural language)"
+          excludes: "List of exclusion criteria (natural language)"
+      - parent: "Reference to parent node"
+      - children: "List of child node references"
+      - version: "Semantic version of this node"
+    optional_fields:
+      - edge_cases: "Values that tested the boundary, with resolution"
+      - decision_record: "Why this criterion was chosen over alternatives"
+      - context: "Inherited from Q0b, recorded at root level"
+
+  id_system:
+    canonical_id:
+      description: >
+        Deterministic ID derived from the full path of answered
+        criteria from root to this node. Internal to one tree.
+      generation: "Hash of ordered criteria path"
+    linking_id:
+      description: >
+        Cross-tree equivalence ID, generated when an LLM
+        determines two nodes from different trees share the
+        same ontological commitment. Includes confidence score.
+      generation: "Semantic comparison of criterion bundles"
+    seed_id:
+      description: >
+        Identifies which questioning protocol was used.
+        Enables provenance tracking.
+      generation: "Seed name + version"

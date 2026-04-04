@@ -1,0 +1,22 @@
+node: Groceries
+canonical_id: "ft.expenditure.variable.groceries"
+question: "Is this a purchase of food or household staples from a supermarket or grocery store?"
+criteria:
+  includes:
+    - "Supermarket purchases (REWE, LIDL, EDEKA, etc.)"
+    - "Organic/bio market purchases"
+    - "International grocery equivalents (Carrefour, Pao de Acucar, CONAD, etc.)"
+  excludes:
+    - "Restaurant meals (even takeaway from non-grocery)"
+    - "Specialty food shops that are primarily dining (bakery cafe)"
+    - "Drugstore purchases (Rossmann, DM) unless food items"
+  edge_cases:
+    - term: "REWE TO GO"
+      resolution: "Included — still a grocery/convenience purchase, not a restaurant"
+      decided: true
+    - term: "Biomarkt"
+      resolution: "Included — organic grocery store"
+      decided: true
+parent: Variable Necessities
+children: []
+version: 1.0.0

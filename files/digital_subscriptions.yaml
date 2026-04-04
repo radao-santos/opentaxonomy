@@ -1,0 +1,31 @@
+node: Digital Subscriptions
+canonical_id: "ft.expenditure.fixed.subscriptions"
+question: "Is this a recurring payment for a digital service or platform?"
+criteria:
+  includes:
+    - "Streaming services (Netflix, Disney+, Spotify, MUBI, Audible)"
+    - "Software subscriptions (ChatGPT, Wix, Apple services)"
+    - "Gaming services (Nintendo, Google Play)"
+    - "Internet service (HerzoMedia/HERZOvision)"
+  excludes:
+    - "One-time digital purchases"
+    - "Physical subscription boxes"
+    - "Mobile phone contract (classified under telecommunications)"
+  edge_cases:
+    - term: "Amazon Prime"
+      resolution: "Included — recurring digital service even though it enables physical delivery"
+      decided: true
+    - term: "HerzoMedia/HERZOvision"
+      resolution: "Included — internet is a digital subscription; could also be telecommunications"
+      decided: false
+parent: Fixed Obligations
+children: []
+version: 1.0.0
+decision_record:
+  criterion_chosen: "Recurring billing for digital access"
+  alternatives_considered:
+    - "Split by media type (video, audio, software)"
+  reason: >
+    In budgeting, what matters is that these are fixed monthly
+    costs that can be individually cancelled. Media type is
+    secondary to the financial commitment structure.

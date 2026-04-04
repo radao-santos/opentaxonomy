@@ -1,0 +1,307 @@
+# ============================================================
+# PLACEMENT MAP — Raw Values → Canonical IDs
+# Seed: personal-finance-transactions@1.0.0
+# Generated: 2026-04-04
+# ============================================================
+# This file maps normalized merchant/entity names to their
+# canonical IDs in the taxonomic tree. This is the "gold" —
+# the moment where raw data acquires meaning.
+# ============================================================
+
+placements:
+
+  # === INCOME ===
+
+  - canonical_id: "ft.income.employment"
+    entities:
+      - normalized: "adidas AG Lohn/Gehalt"
+        raw_samples:
+          - "adidas AG Payment Reference/Lohn/Gehalt 00677813/202412 SALA Lohn/Gehalt"
+          - "adidas AG Payment Reference/Lohn/Gehalt 00677813/202403 SALA Lohn/Gehalt"
+      - normalized: "adidas AG Bonus"
+        raw_samples:
+          - "adidas AG bonus"
+      - normalized: "adidas AG Home Allowance"
+        raw_samples:
+          - "adidas AG home allowance"
+
+  - canonical_id: "ft.income.government"
+    entities:
+      - normalized: "Familienkasse Kindergeld"
+        raw_samples:
+          - "Bundesagentur für Arbeit - Familienkasse Payment Reference/KG735005FK707575 0424..."
+          - "Bundesagentur für Arbeit - Familienkasse Payment Reference/KG735005FK707575 0224..."
+
+  # === FIXED OBLIGATIONS ===
+
+  - canonical_id: "ft.expenditure.fixed.housing"
+    entities:
+      - normalized: "Rent (Markus Enzinger)"
+        raw_samples:
+          - "SEPA Dauerauftrag an Markus Enzinger ... Payment Reference/Rent RINP Dauerauftrag"
+      - normalized: "Herzo Werke (Utilities)"
+        raw_samples:
+          - "SEPA Dauerauftrag an Herzo Werke IBAN DE68763500000060..."
+
+  - canonical_id: "ft.expenditure.fixed.telecommunications"
+    entities:
+      - normalized: "Vodafone"
+        raw_samples:
+          - "Vodafone GmbH Payment Reference/0000113199164..."
+
+  - canonical_id: "ft.expenditure.fixed.insurance"
+    entities:
+      - normalized: "Itzehoer Rechtsschutzversicherung"
+        raw_samples:
+          - "ITZEHOER VERS.VEREIN Payment Reference/25295105-850 RECHTSSCHUTZ-V..."
+      - normalized: "Hausratversicherung (Konzept & Marketing)"
+        raw_samples:
+          - "Konzept und Marketing GmbH Payment Reference/HAUSRATVERSICHERUNG-NR..."
+
+  - canonical_id: "ft.expenditure.fixed.subscriptions"
+    entities:
+      - normalized: "Netflix"
+        raw_samples:
+          - "Netflix.com Sao Paulo BRA"
+          - "Netflix Entretenimento Barueri SP"
+      - normalized: "Spotify"
+        raw_samples:
+          - "PayPal ... Spotify AB, Ihr Einkauf bei Spotify AB..."
+      - normalized: "Disney+"
+        raw_samples:
+          - "PayPal ... DisneyPlus, Ihr Einkauf bei DisneyPlus..."
+      - normalized: "ChatGPT"
+        raw_samples:
+          - "ChatGPT Subscription San Francisco CA"
+          - "Kartenzahlung OPENAI *CHATGPT SUBSCR San Francisco USD..."
+      - normalized: "MUBI"
+        raw_samples:
+          - "MUBI.com London LND"
+          - "Mubi.com London LND"
+          - "WWW.MUBI.COM London LND"
+      - normalized: "Audible"
+        raw_samples:
+          - "Audible GmbH 994XB5Z05 Audible.de rg DEU"
+      - normalized: "Amazon Prime"
+        raw_samples:
+          - "AMAZON EU S.a.r.l. ... AMZNPrime DE..."
+      - normalized: "HerzoMedia Internet"
+        raw_samples:
+          - "Herzo Media GmbH Co. KG Payment Reference/Knr. 60217..."
+      - normalized: "Apple Services"
+        raw_samples:
+          - "Apple.com Bill IRL"
+
+  - canonical_id: "ft.expenditure.fixed.childcare"
+    entities:
+      - normalized: "Kita Beitrag (Kirchengemeinde Erlangen)"
+        raw_samples:
+          - "Evang.-Luth. Gesamtkirchengemeinde Erlangen ... Kita-Beitrag-Mesquita dos Santos, Maria Flor..."
+      - normalized: "Kita Essen (Kitafino/GFI)"
+        raw_samples:
+          - "Kitafino IBAN ... Payment Reference/91073-308 TOM DOS SANTOS..."
+          - "GFI GMBH Payment Reference/MiBe 01/24 Mesquita dos Santos, Tom..."
+      - normalized: "Ballet (Hannelore Kreiner)"
+        raw_samples:
+          - "Hannelore Kreiner Payment Reference/... Flor Maria ... BALLETTSTUDIOKREINER..."
+
+  - canonical_id: "ft.expenditure.fixed.broadcasting"
+    entities:
+      - normalized: "ARD ZDF Rundfunkbeitrag"
+        raw_samples:
+          - "ARD ZDF DRadio Beitragsservice Payment Reference/Rundfunk 12.2023..."
+
+  - canonical_id: "ft.expenditure.fixed.fitness"
+    entities:
+      - normalized: "FT-Club / HZO GYM"
+        raw_samples:
+          - "FT-CLUB via Mollie ... HZO GYM Partner Membership..."
+
+  # === VARIABLE NECESSITIES ===
+
+  - canonical_id: "ft.expenditure.variable.groceries"
+    entities:
+      - normalized: "REWE"
+        raw_samples:
+          - "REWE SAGT DANKE. 46654184/Herzogenaurach/DE..."
+          - "REWE Regiemarkt GmbH Herzogenaurach"
+          - "REWE SAGT DANKE. 46654185//Herzogenaurach/DE..."
+      - normalized: "LIDL"
+        raw_samples:
+          - "LIDL SAGT DANKE/Herzogenaurach/DE..."
+      - normalized: "EDEKA"
+        raw_samples:
+          - "EDEKA Baechmann Herzogenaurach"
+          - "Edeka Silberhorn Nuernberg DEU"
+      - normalized: "Biomarkt"
+        raw_samples:
+          - "DANKE, IHR BIOMARKT Payment Reference/..."
+
+  - canonical_id: "ft.expenditure.variable.transport"
+    entities:
+      - normalized: "Deutsche Bahn"
+        raw_samples:
+          - "DB Vertrieb GmbH Payment Reference/..."
+          - "DB AUTOMAT/NUERNBERG HBF/DE..."
+      - normalized: "BVG Berlin"
+        raw_samples:
+          - "BERLINER VERKEHRSBETRIEBE (BVG)/BERLIN/DE..."
+      - normalized: "MVG München"
+        raw_samples:
+          - "MVG Handy Ticket Muenchen BY"
+      - normalized: "Parking"
+        raw_samples:
+          - "PayByPhone Deutschland Erlangen"
+          - "PARKEN ERLANGEN ARCADEN//ERLANGEN/DE..."
+          - "Contipark 09033005603 Erlangen"
+
+  - canonical_id: "ft.expenditure.variable.fuel"
+    entities:
+      - normalized: "Aral"
+        raw_samples:
+          - "Aral Station 220521140 Wuerzburg"
+      - normalized: "OMV"
+        raw_samples:
+          - "OMV 7546 Herzogenaurach"
+      - normalized: "EnBW Charging"
+        raw_samples:
+          - "EnBW Wald GmbH Muenchen DEU"
+
+  - canonical_id: "ft.expenditure.variable.health"
+    entities:
+      - normalized: "Herz-Apotheke"
+        raw_samples:
+          - "HERZ-APOTHEKE KERSTIN WIRT/HERZOGENAURACH/DE..."
+      - normalized: "MVZ Ganzimmun (Lab)"
+        raw_samples:
+          - "SEPA Überweisung an MVZ GANZIMMUN..."
+
+  - canonical_id: "ft.expenditure.variable.household"
+    entities:
+      - normalized: "Rossmann"
+        raw_samples:
+          - "ROSSMANN//Herzogenaurach/DE..."
+          - "ROSSMANN 2753 HERZOGENAURACH Payment Reference/..."
+      - normalized: "DM Drogerie"
+        raw_samples:
+          - "DM Drogerie/Neuhauser Straße 5/München/DE..."
+      - normalized: "Mueller"
+        raw_samples:
+          - "MUELLER SAGT DANKE/Herzogenaurach/DE..."
+          - "Muller GmbH Co. KG/Hauptstrasse 17/Herzogenaurach/DE..."
+
+  # === DISCRETIONARY ===
+
+  - canonical_id: "ft.expenditure.discretionary.dining"
+    entities:
+      - normalized: "McDonalds"
+        raw_samples:
+          - "01308 MCDONALDS//HERZOGENAURACH/DE..."
+          - "McDonalds 01308 Herzogenaurach BY"
+          - "McDonalds 01434 Erlangen BY"
+      - normalized: "Restaurant Kaizen"
+        raw_samples:
+          - "RESTAURANT KAIZEN//Herzogenaurach/DE..."
+      - normalized: "Uber Eats / Lieferando"
+        raw_samples:
+          - "Lieferando.de NG24OF Amsterdam NLD"
+          - "PayPal ... Takeaway.com Payments B.V...."
+      - normalized: "Five Guys"
+        raw_samples:
+          - "Five Guys Germany GmbH ... NUERNBERG/DE..."
+
+  - canonical_id: "ft.expenditure.discretionary.shopping_fashion"
+    entities:
+      - normalized: "Zalando"
+        raw_samples:
+          - "PayPal ... Zalando Payments GmbH, Ihr Einkauf bei Zalando..."
+      - normalized: "H&M"
+        raw_samples:
+          - "HM Erlangen 717//Hamburg/DE..."
+          - "H+M Muenchen 172//Muenchen/DE..."
+      - normalized: "Zara"
+        raw_samples:
+          - "ZARA BARCELONA P GRACI//BARCELONA/ES..."
+      - normalized: "Adidas Online"
+        raw_samples:
+          - "PayPal ... Adidas AG, Ihr Einkauf bei Adidas AG..."
+
+  - canonical_id: "ft.expenditure.discretionary.shopping_online"
+    entities:
+      - normalized: "Amazon"
+        raw_samples:
+          - "AMZN Mktp DE W33C008W5 Luxembourg"
+          - "AMAZON PAYMENTS EUROPE S.C.A. Payment Reference/..."
+      - normalized: "AliExpress"
+        raw_samples:
+          - "AliExpress London GBR"
+          - "AliExpress Luxembourg"
+      - normalized: "Action"
+        raw_samples:
+          - "Action 3289/Schützengraben 20/Herzogenaurach/DE..."
+
+  - canonical_id: "ft.expenditure.discretionary.entertainment"
+    entities:
+      - normalized: "Euro Disney"
+        raw_samples:
+          - "EURO DISNEY ASSOCIES//CHESSY/FR..."
+      - normalized: "Cinestar Erlangen"
+        raw_samples:
+          - "Cinestar Erlangen Erlangen BY"
+      - normalized: "Trampolinhalle Nürnberg"
+        raw_samples:
+          - "PayPal ... Trampolinhalle Nürnberg GmbH..."
+      - normalized: "Museum (Brussels)"
+        raw_samples:
+          - "Museum Voor Schone Kun Brussels BEL"
+          - "VZW Atomium Brussel BEL"
+
+  - canonical_id: "ft.expenditure.discretionary.travel"
+    entities:
+      - normalized: "Ryanair"
+        raw_samples:
+          - "Ryanair 224KLR9WZ Swords IRL"
+      - normalized: "Booking.com"
+        raw_samples:
+          - "Booking.com Amsterdam NLD"
+      - normalized: "MEININGER Hotel"
+        raw_samples:
+          - "MEININGER Munich Olympiapark/..."
+
+  # === PERSONAL TRANSFERS ===
+
+  - canonical_id: "ft.expenditure.personal_transfers"
+    entities:
+      - normalized: "Camila (family)"
+        raw_samples:
+          - "Camila Dora de Figueiredo Mesquita Payment Reference/..."
+      - normalized: "Lila Mesquita (family)"
+        raw_samples:
+          - "Lila Mesquita IBAN..."
+      - normalized: "Grazielle (therapy)"
+        raw_samples:
+          - "MARTINS FERREIRA GRAZIELLE AQUENY Payment Reference/... Terapia..."
+
+  # === CASH WITHDRAWALS ===
+
+  - canonical_id: "ft.expenditure.cash"
+    entities:
+      - normalized: "ATM Withdrawal"
+        raw_samples:
+          - "Bargeldauszahlung GAA Payment Reference/HypoVereinsbank/Herzogenaurach/DE..."
+
+# ============================================================
+# UNRESOLVED VALUES
+# ============================================================
+
+unresolved:
+  - raw: "Payment Reference/Balance of settlement items"
+    reason: "No identifiable merchant or purpose"
+  - raw: "PayPal Europe S.a.r.l. ... Ihr Einkauf bei 1032246089986"
+    reason: "PayPal transaction with no merchant name — only reference number"
+  - raw: "PayPal Europe S.a.r.l. ... Ihr Einkauf bei 103329765951"
+    reason: "PayPal transaction with no merchant name — only reference number"
+  - raw: "DAVID GINES//VILOBI D ONYA/ES"
+    reason: "Unknown entity — could be restaurant, shop, or individual"
+  - raw: "FLORIAN PICHA//MUENCHEN/DE"
+    reason: "Unknown entity — could be restaurant, shop, or individual"
