@@ -26,6 +26,9 @@ dist/
 # Taxonomy output (generated data — not source)
 taxonomy/
 
+# Claude Code
+.claude/
+
 # OS
 .DS_Store
 Thumbs.db
