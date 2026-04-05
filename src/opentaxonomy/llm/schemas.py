@@ -4,10 +4,23 @@ These are internal to the LLM layer and not part of the public taxonomy output f
 """
 from __future__ import annotations
 
-from typing import Optional
-from pydantic import BaseModel
+import json
+from typing import Any, Optional
+from pydantic import BaseModel, field_validator
 
 from ..taxonomy.models import EdgeCase, DecisionRecord
+
+
+def _parse_stringified_list(v: Any) -> Any:
+    """LLMs occasionally return a JSON array as a string. Parse it back."""
+    if isinstance(v, str):
+        try:
+            parsed = json.loads(v)
+            if isinstance(parsed, list):
+                return parsed
+        except (json.JSONDecodeError, ValueError):
+            pass
+    return v
 
 
 # ── Normalization ──────────────────────────────────────────────────────────────
@@ -20,6 +33,8 @@ class NormalizedEntity(BaseModel):
 
 class NormalizationResult(BaseModel):
     entities: list[NormalizedEntity]
+
+    _parse_entities = field_validator("entities", mode="before")(_parse_stringified_list)
 
 
 # ── Foundation (Q0 + Q0b) ─────────────────────────────────────────────────────
@@ -51,6 +66,9 @@ class PrimaryDiffResult(BaseModel):
     question: str
     branches: list[BranchDef]
     unplaced: list[str] = []
+
+    _parse_branches = field_validator("branches", mode="before")(_parse_stringified_list)
+    _parse_unplaced = field_validator("unplaced", mode="before")(_parse_stringified_list)
 
 
 # ── Recursive differentiation (Q2) ────────────────────────────────────────────
@@ -85,6 +103,8 @@ class ValueFit(BaseModel):
 class TreeFitResult(BaseModel):
     fits: list[ValueFit]
 
+    _parse_fits = field_validator("fits", mode="before")(_parse_stringified_list)
+
 
 class GraftBranch(BaseModel):
     key: str
@@ -99,6 +119,9 @@ class GraftBranch(BaseModel):
 class GraftResult(BaseModel):
     branches: list[GraftBranch]
     unplaced: list[str] = []
+
+    _parse_branches = field_validator("branches", mode="before")(_parse_stringified_list)
+    _parse_unplaced = field_validator("unplaced", mode="before")(_parse_stringified_list)
 
 
 # ── Placement ─────────────────────────────────────────────────────────────────
@@ -117,3 +140,6 @@ class UnresolvedVal(BaseModel):
 class PlacementResult(BaseModel):
     placed: list[PlacedValue]
     unresolved: list[UnresolvedVal] = []
+
+    _parse_placed = field_validator("placed", mode="before")(_parse_stringified_list)
+    _parse_unresolved = field_validator("unresolved", mode="before")(_parse_stringified_list)
