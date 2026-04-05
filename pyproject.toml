@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "opentaxonomy"
-version = "0.1.2"
+version = "0.1.3"
 description = "LLM-powered semantic taxonomy generator for raw categorical data"
 readme = "README.md"
 license = { text = "MIT" }

@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Taxonomix</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Fraunces:ital,opsz,wght@0,9..144,200;0,9..144,400;0,9..144,600;1,9..144,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #0f0e0c;
+  --paper: #f4f1ea;
+  --bone: #e2ddd4;
+  --muted: #9a9488;
+  --card: #faf8f4;
+  --sidebar-bg: #121110;
+  --sidebar-text: #c8c4bc;
+  --sidebar-muted: #5a5750;
+  --sidebar-active: #f4f1ea;
+  --accent: #c84b2f;
+  --green: #2e7d52;
+  --blue: #2e5a8c;
+  --yellow: #c49a1a;
+  --tag-time: #c84b2f;
+  --tag-dim: #2e5a8c;
+  --tag-measure: #2e7d52;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'DM Mono', monospace;
+  font-size: 12.5px;
+  height: 100vh;
+  display: flex;
+  overflow: hidden;
+}
+
+/* ─── SIDEBAR ─────────────────────────────────────── */
+.sidebar {
+  width: 220px;
+  min-width: 220px;
+  background: var(--sidebar-bg);
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  border-right: 1px solid #222;
+}
+
+.sidebar-logo {
+  padding: 22px 20px 18px;
+  border-bottom: 1px solid #222;
+  font-family: 'Fraunces', serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--sidebar-active);
+  letter-spacing: -0.3px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.logo-pip {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: breathe 2.5s ease-in-out infinite;
+}
+
+@keyframes breathe {
+  0%,100% { opacity:1; } 50% { opacity:.3; }
+}
+
+.sidebar-section-label {
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--sidebar-muted);
+  padding: 18px 20px 8px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 20px;
+  cursor: pointer;
+  color: var(--sidebar-muted);
+  transition: all 0.15s;
+  border-left: 2px solid transparent;
+  user-select: none;
+}
+
+.nav-item:hover { color: var(--sidebar-text); background: #1a1917; }
+
+.nav-item.active {
+  color: var(--sidebar-active);
+  border-left-color: var(--accent);
+  background: #1e1c1a;
+}
+
+.nav-num {
+  font-size: 10px;
+  color: var(--sidebar-muted);
+  width: 16px;
+  flex-shrink: 0;
+}
+
+.nav-item.active .nav-num { color: var(--accent); }
+
+.nav-label { font-size: 12px; flex: 1; }
+
+.nav-badge {
+  font-size: 9px;
+  padding: 1px 6px;
+  border-radius: 0;
+  background: #2a2826;
+  color: var(--sidebar-muted);
+  letter-spacing: 0.04em;
+}
+
+.nav-item.active .nav-badge { background: var(--accent); color: white; }
+.nav-item.done .nav-badge { background: #1e3d2c; color: var(--green); }
+
+.sidebar-divider { height: 1px; background: #1e1c1a; margin: 8px 0; }
+
+.sidebar-footer {
+  margin-top: auto;
+  padding: 16px 20px;
+  border-top: 1px solid #1e1c1a;
+  font-size: 10px;
+  color: var(--sidebar-muted);
+  line-height: 1.8;
+}
+
+/* ─── MAIN ─────────────────────────────────────────── */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--paper);
+}
+
+.topbar {
+  height: 52px;
+  border-bottom: 1px solid var(--bone);
+  display: flex;
+  align-items: center;
+  padding: 0 28px;
+  gap: 16px;
+  background: var(--card);
+  flex-shrink: 0;
+}
+
+.topbar-title {
+  font-family: 'Fraunces', serif;
+  font-size: 16px;
+  font-weight: 400;
+  flex: 1;
+}
+
+.topbar-subtitle {
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+}
+
+.btn {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 7px 16px;
+  border: 1px solid var(--bone);
+  background: var(--card);
+  color: var(--ink);
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.btn:hover { border-color: var(--ink); }
+.btn-dark { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.btn-dark:hover { background: var(--accent); border-color: var(--accent); }
+.btn-green { background: var(--green); color: white; border-color: var(--green); }
+
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 28px;
+}
+
+/* ─── STAGE VIEWS ───────────────────────────────────── */
+.stage { display: none; }
+.stage.active { display: block; }
+
+/* ─── STAGE 1: INGEST ───────────────────────────────── */
+.ingest-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.panel {
+  border: 1px solid var(--bone);
+  background: var(--card);
+}
+
+.panel-head {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--bone);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.panel-head strong { color: var(--ink); font-weight: 500; }
+
+.source-list { padding: 8px; display: flex; flex-direction: column; gap: 6px; }
+
+.source-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--bone);
+  cursor: pointer;
+  transition: all 0.15s;
+  background: var(--paper);
+}
+
+.source-row:hover { border-color: var(--ink); }
+.source-row.selected { border-color: var(--accent); background: #fdf5f3; }
+
+.source-icon { font-size: 14px; width: 24px; text-align: center; }
+
+.source-info { flex: 1; }
+.source-name { font-size: 12px; margin-bottom: 2px; }
+.source-meta { font-size: 10px; color: var(--muted); }
+
+.source-pill {
+  font-size: 9px;
+  padding: 2px 7px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.pill-done { background: #e8f4ee; color: var(--green); border: 1px solid #b8ddc9; }
+.pill-pending { background: #fef9ec; color: var(--yellow); border: 1px solid #e8d898; }
+.pill-new { background: #fdeee9; color: var(--accent); border: 1px solid #f0c0b0; }
+
+.add-source-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+  border: 1px dashed var(--bone);
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transition: all 0.15s;
+  margin: 8px;
+}
+.add-source-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+/* FIELD TABLE */
+.field-table { width: 100%; border-collapse: collapse; }
+
+.field-table th {
+  text-align: left;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--bone);
+  background: var(--paper);
+  font-weight: 400;
+}
+
+.field-table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--bone);
+  font-size: 11.5px;
+  vertical-align: middle;
+}
+
+.field-table tr:last-child td { border-bottom: none; }
+.field-table tr:hover td { background: rgba(15,14,12,0.02); }
+
+.type-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  padding: 2px 8px;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: all 0.15s;
+  border: 1px solid transparent;
+}
+
+.type-time { background: #fdeee9; color: var(--tag-time); border-color: #f0c0b0; }
+.type-dimension { background: #e8eef6; color: var(--tag-dim); border-color: #b8cce0; }
+.type-measure { background: #e8f4ee; color: var(--tag-measure); border-color: #b8ddc9; }
+.type-unknown { background: #f0ede8; color: var(--muted); border-color: var(--bone); }
+
+.type-badge:hover { opacity: 0.75; }
+
+.sample-val {
+  font-size: 10px;
+  color: var(--muted);
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ─── STAGE 2: DIMENSIONS ───────────────────────────── */
+.dim-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.dim-card {
+  border: 1px solid var(--bone);
+  background: var(--card);
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.dim-card::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+}
+
+.dim-card.time::before { background: var(--tag-time); }
+.dim-card.geo::before { background: var(--tag-dim); }
+.dim-card.custom::before { background: var(--yellow); }
+.dim-card.measure::before { background: var(--tag-measure); }
+
+.dim-card:hover { border-color: var(--ink); transform: translateY(-1px); }
+.dim-card.expanded { border-color: var(--ink); }
+
+.dim-card-head {
+  padding: 14px 14px 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.dim-icon { font-size: 18px; }
+
+.dim-info { flex: 1; }
+.dim-name {
+  font-family: 'Fraunces', serif;
+  font-size: 15px;
+  font-weight: 400;
+  margin-bottom: 2px;
+}
+.dim-sub { font-size: 10px; color: var(--muted); }
+
+.dim-count {
+  font-size: 10px;
+  color: var(--muted);
+  text-align: right;
+}
+
+.dim-card-body {
+  padding: 0 18px 14px;
+  display: none;
+  border-top: 1px solid var(--bone);
+}
+
+.dim-card.expanded .dim-card-body { display: block; }
+
+.hierarchy-chain {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  padding: 10px 0;
+  font-size: 10px;
+  color: var(--muted);
+}
+
+.hier-node {
+  padding: 3px 8px;
+  border: 1px solid var(--bone);
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.hier-node:hover { border-color: var(--ink); }
+.hier-node.current { border-color: var(--accent); color: var(--accent); background: #fdeee9; }
+
+.hier-arrow { color: var(--bone); font-size: 12px; }
+
+.fields-in-dim { margin-top: 8px; }
+.fields-label { font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+
+.field-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  padding: 2px 8px;
+  border: 1px solid var(--bone);
+  background: var(--paper);
+  margin: 2px;
+  cursor: pointer;
+}
+
+.chip-source { color: var(--muted); font-size: 9px; }
+
+/* ─── STAGE 3: CONNECT ──────────────────────────────── */
+.connect-layout {
+  display: grid;
+  grid-template-columns: 1fr 60px 1fr;
+  gap: 0;
+  align-items: start;
+}
+
+.connect-col { border: 1px solid var(--bone); background: var(--card); }
+
+.connect-mid {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 60px;
+  gap: 8px;
+}
+
+.connect-line {
+  width: 1px;
+  background: var(--bone);
+  flex: 1;
+  min-height: 20px;
+}
+
+.connect-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  border: 1.5px solid var(--accent);
+  background: var(--paper);
+  cursor: pointer;
+}
+.connect-dot.linked { background: var(--accent); }
+
+.map-row {
+  padding: 9px 14px;
+  border-bottom: 1px solid var(--bone);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11.5px;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+
+.map-row:last-child { border-bottom: none; }
+.map-row:hover { background: rgba(15,14,12,0.02); }
+.map-row.linked { background: #fdeee9; }
+
+.map-field-name { flex: 1; }
+.map-source-tag { font-size: 9px; color: var(--muted); letter-spacing: 0.04em; }
+
+.link-indicator {
+  font-size: 10px;
+  padding: 1px 6px;
+  background: #fdeee9;
+  color: var(--accent);
+  border: 1px solid #f0c0b0;
+  display: none;
+}
+
+.map-row.linked .link-indicator { display: inline; }
+
+.connect-legend {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+  font-size: 10px;
+  color: var(--muted);
+}
+
+.legend-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+/* ─── STAGE 4: EXPORT ───────────────────────────────── */
+.export-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-bottom: 28px;
+}
+
+.export-card {
+  border: 1px solid var(--bone);
+  background: var(--card);
+  padding: 22px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+
+.export-card:hover { border-color: var(--ink); transform: translateY(-2px); }
+.export-card.selected { border-color: var(--accent); background: #fdeee9; }
+
+.export-icon { font-size: 28px; margin-bottom: 10px; }
+.export-name {
+  font-family: 'Fraunces', serif;
+  font-size: 15px;
+  font-weight: 400;
+  margin-bottom: 4px;
+}
+.export-desc { font-size: 10px; color: var(--muted); line-height: 1.6; }
+
+.export-config {
+  border: 1px solid var(--bone);
+  background: var(--card);
+  padding: 24px;
+  margin-bottom: 14px;
+}
+
+.config-row {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--bone);
+}
+
+.config-row:last-child { border-bottom: none; }
+
+.config-label { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+
+.config-input {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  background: var(--paper);
+  border: 1px solid var(--bone);
+  padding: 6px 10px;
+  color: var(--ink);
+  width: 100%;
+  outline: none;
+}
+
+.config-input:focus { border-color: var(--ink); }
+
+.config-select {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  background: var(--paper);
+  border: 1px solid var(--bone);
+  padding: 6px 10px;
+  color: var(--ink);
+  width: 100%;
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+}
+
+/* ─── PROGRESS BAR ──────────────────────────────────── */
+.progress-strip {
+  display: flex;
+  height: 3px;
+  background: var(--bone);
+}
+
+.progress-fill {
+  background: var(--accent);
+  transition: width 0.4s ease;
+}
+
+/* ─── RULER ─────────────────────────────────────────── */
+.ruler-wrap {
+  border: 1px solid var(--bone);
+  padding: 16px;
+  background: var(--card);
+  margin-top: 10px;
+}
+
+.ruler-label { font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+
+.ruler-track {
+  position: relative;
+  height: 20px;
+  background: var(--paper);
+  border: 1px solid var(--bone);
+  margin-bottom: 6px;
+  overflow: visible;
+}
+
+.ruler-fill {
+  height: 100%;
+  background: repeating-linear-gradient(90deg, var(--accent) 0px, var(--accent) 1px, transparent 1px, transparent 10px);
+  opacity: 0.12;
+}
+
+.ruler-pin {
+  position: absolute;
+  top: -4px; bottom: -4px;
+  width: 2px;
+  background: var(--accent);
+}
+
+.ruler-pin-label {
+  position: absolute;
+  top: -18px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 8px;
+  color: var(--accent);
+  white-space: nowrap;
+  letter-spacing: 0.04em;
+}
+
+.ruler-ticks {
+  display: flex;
+  justify-content: space-between;
+}
+
+.ruler-tick { font-size: 8px; color: var(--muted); }
+.ruler-tick.here { color: var(--accent); }
+
+/* ─── MISC ──────────────────────────────────────────── */
+.empty-state {
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--muted);
+}
+
+.empty-state-icon { font-size: 32px; margin-bottom: 12px; }
+.empty-state-text { font-size: 12px; line-height: 1.7; }
+
+.stat-bar {
+  display: flex;
+  gap: 1px;
+  margin-bottom: 20px;
+  background: var(--bone);
+}
+
+.stat-cell {
+  flex: 1;
+  background: var(--card);
+  padding: 14px 16px;
+  text-align: center;
+}
+
+.stat-num {
+  font-family: 'Fraunces', serif;
+  font-size: 28px;
+  font-weight: 200;
+  line-height: 1;
+  margin-bottom: 2px;
+}
+
+.stat-lbl { font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+
+/* scrollbar */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--bone); }
+
+/* grid bg */
+.content::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(15,14,12,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(15,14,12,0.025) 1px, transparent 1px);
+  background-size: 28px 28px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.content > * { position: relative; z-index: 1; }
+
+.fade-in { animation: fi 0.35s ease-out both; }
+@keyframes fi { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+</style>
+</head>
+<body>
+
+<!-- ═══ SIDEBAR ═══════════════════════════════════════ -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <span class="logo-pip"></span>
+    Taxonomix
+  </div>
+
+  <div class="sidebar-section-label">Workflow</div>
+
+  <div class="nav-item done" data-stage="1" onclick="setStage(1)">
+    <span class="nav-num">01</span>
+    <span class="nav-label">Ingest Data</span>
+    <span class="nav-badge">4</span>
+  </div>
+
+  <div class="nav-item active" data-stage="2" onclick="setStage(2)">
+    <span class="nav-num">02</span>
+    <span class="nav-label">Dimensions</span>
+    <span class="nav-badge">5</span>
+  </div>
+
+  <div class="nav-item" data-stage="3" onclick="setStage(3)">
+    <span class="nav-num">03</span>
+    <span class="nav-label">Connect</span>
+    <span class="nav-badge">—</span>
+  </div>
+
+  <div class="nav-item" data-stage="4" onclick="setStage(4)">
+    <span class="nav-num">04</span>
+    <span class="nav-label">Export</span>
+    <span class="nav-badge">—</span>
+  </div>
+
+  <div class="sidebar-divider"></div>
+  <div class="sidebar-section-label">Sources</div>
+
+  <div class="nav-item" style="font-size:11px; padding:7px 20px;" onclick="setStage(1)">
+    <span style="font-size:10px">📊</span>
+    <span style="flex:1; color:var(--sidebar-text)">Sales_Q4.csv</span>
+  </div>
+  <div class="nav-item" style="font-size:11px; padding:7px 20px;" onclick="setStage(1)">
+    <span style="font-size:10px">🗄</span>
+    <span style="flex:1; color:var(--sidebar-text)">product_events</span>
+  </div>
+  <div class="nav-item" style="font-size:11px; padding:7px 20px;" onclick="setStage(1)">
+    <span style="font-size:10px">📋</span>
+    <span style="flex:1; color:var(--sidebar-text)">Customer_Master</span>
+  </div>
+  <div class="nav-item" style="font-size:11px; padding:7px 20px;" onclick="setStage(1)">
+    <span style="font-size:10px">📦</span>
+    <span style="flex:1; color:var(--sidebar-text)">inventory_log</span>
+  </div>
+
+  <div class="sidebar-footer">
+    89 fields classified<br>
+    97% avg. confidence
+  </div>
+</aside>
+
+<!-- ═══ MAIN ═══════════════════════════════════════════ -->
+<div class="main">
+
+  <!-- Progress strip -->
+  <div class="progress-strip">
+    <div class="progress-fill" id="progressFill" style="width:25%"></div>
+  </div>
+
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="topbar-title" id="topbarTitle">02 — Dimensions</div>
+    <span class="topbar-subtitle" id="topbarSub">AI-classified · 5 distinct dimensions found</span>
+    <button class="btn" id="topbarSecBtn" onclick="topbarSecAction()">Review All</button>
+    <button class="btn btn-dark" id="topbarPriBtn" onclick="nextStage()">Continue →</button>
+  </div>
+
+  <div class="content">
+
+    <!-- ═══ STAGE 1: INGEST ════════════════════════════ -->
+    <div class="stage" id="stage1">
+      <div class="stat-bar fade-in">
+        <div class="stat-cell"><div class="stat-num">4</div><div class="stat-lbl">Sources</div></div>
+        <div class="stat-cell"><div class="stat-num">89</div><div class="stat-lbl">Total Fields</div></div>
+        <div class="stat-cell"><div class="stat-num">3</div><div class="stat-lbl">Classified</div></div>
+        <div class="stat-cell"><div class="stat-num">1</div><div class="stat-lbl">Pending</div></div>
+      </div>
+
+      <div class="ingest-layout fade-in">
+        <!-- Left: source list -->
+        <div class="panel">
+          <div class="panel-head">
+            <strong>Connected Sources</strong>
+            <span>4 total</span>
+          </div>
+          <div class="source-list">
+            <div class="source-row selected" onclick="selectSource(this, 'sales')">
+              <div class="source-icon">📊</div>
+              <div class="source-info">
+                <div class="source-name">Sales_Q4_2024.csv</div>
+                <div class="source-meta">Finance · 84,302 rows · 12 fields</div>
+              </div>
+              <span class="source-pill pill-done">Mapped</span>
+            </div>
+            <div class="source-row" onclick="selectSource(this, 'product')">
+              <div class="source-icon">🗄</div>
+              <div class="source-info">
+                <div class="source-name">product_events</div>
+                <div class="source-meta">Product · PostgreSQL · live</div>
+              </div>
+              <span class="source-pill pill-done">Mapped</span>
+            </div>
+            <div class="source-row" onclick="selectSource(this, 'customer')">
+              <div class="source-icon">📋</div>
+              <div class="source-info">
+                <div class="source-name">Customer_Master.xlsx</div>
+                <div class="source-meta">CRM · 22,109 rows · 31 fields</div>
+              </div>
+              <span class="source-pill pill-done">Mapped</span>
+            </div>
+            <div class="source-row" onclick="selectSource(this, 'inventory')">
+              <div class="source-icon">📦</div>
+              <div class="source-info">
+                <div class="source-name">inventory_log</div>
+                <div class="source-meta">Ops · BigQuery · 3 pending</div>
+              </div>
+              <span class="source-pill pill-pending">Review</span>
+            </div>
+            <div class="add-source-btn">
+              <span>＋</span> Add new source
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: field inspector -->
+        <div class="panel">
+          <div class="panel-head">
+            <strong id="fieldPanelTitle">Sales_Q4_2024.csv — Fields</strong>
+            <span id="fieldPanelMeta">12 fields</span>
+          </div>
+          <table class="field-table" id="fieldTable">
+            <thead>
+              <tr>
+                <th>Field Name</th>
+                <th>AI Type</th>
+                <th>Sample Values</th>
+              </tr>
+            </thead>
+            <tbody id="fieldTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ STAGE 2: DIMENSIONS ════════════════════════ -->
+    <div class="stage active" id="stage2">
+      <div class="stat-bar fade-in">
+        <div class="stat-cell"><div class="stat-num">5</div><div class="stat-lbl">Dimensions</div></div>
+        <div class="stat-cell"><div class="stat-num">3</div><div class="stat-lbl">Hierarchies</div></div>
+        <div class="stat-cell"><div class="stat-num">89</div><div class="stat-lbl">Fields Mapped</div></div>
+        <div class="stat-cell"><div class="stat-num">97%</div><div class="stat-lbl">Confidence</div></div>
+      </div>
+
+      <div class="dim-grid fade-in">
+
+        <!-- TIME -->
+        <div class="dim-card time expanded" onclick="toggleDim(this)">
+          <div class="dim-card-head">
+            <div class="dim-icon">⏱</div>
+            <div class="dim-info">
+              <div class="dim-name">Time</div>
+              <div class="dim-sub">Standard · ISO 8601</div>
+            </div>
+            <div class="dim-count">7 fields<br><span style="color:var(--tag-time)">94% conf.</span></div>
+          </div>
+          <div class="dim-card-body">
+            <div class="ruler-wrap" style="margin-top:0;margin-bottom:10px;">
+              <div class="ruler-label">Atomic granularity detected across sources</div>
+              <div class="ruler-track">
+                <div class="ruler-fill" style="width:55%"></div>
+                <div class="ruler-pin" style="left:55%">
+                  <div class="ruler-pin-label">Quarter (most atomic)</div>
+                </div>
+              </div>
+              <div class="ruler-ticks">
+                <span class="ruler-tick">∞</span>
+                <span class="ruler-tick">Century</span>
+                <span class="ruler-tick">Year</span>
+                <span class="ruler-tick here">Quarter ▲</span>
+                <span class="ruler-tick">Month</span>
+                <span class="ruler-tick">Day</span>
+                <span class="ruler-tick">Hour</span>
+                <span class="ruler-tick">Sec</span>
+              </div>
+            </div>
+            <div class="hierarchy-chain">
+              <span class="hier-node">Century</span><span class="hier-arrow">›</span>
+              <span class="hier-node">Year</span><span class="hier-arrow">›</span>
+              <span class="hier-node current">Quarter</span><span class="hier-arrow">›</span>
+              <span class="hier-node" style="color:var(--muted);border-style:dashed">Month</span>
+            </div>
+            <div class="fields-in-dim">
+              <div class="fields-label">Mapped fields</div>
+              <span class="field-chip">order_quarter <span class="chip-source">Sales_Q4</span></span>
+              <span class="field-chip">event_date <span class="chip-source">product_events</span></span>
+              <span class="field-chip">signup_date <span class="chip-source">Customer</span></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- GEOGRAPHY -->
+        <div class="dim-card geo" onclick="toggleDim(this)">
+          <div class="dim-card-head">
+            <div class="dim-icon">🌍</div>
+            <div class="dim-info">
+              <div class="dim-name">Geography</div>
+              <div class="dim-sub">Standard · ISO 3166</div>
+            </div>
+            <div class="dim-count">12 fields<br><span style="color:var(--tag-dim)">99% conf.</span></div>
+          </div>
+          <div class="dim-card-body">
+            <div class="hierarchy-chain">
+              <span class="hier-node">Continent</span><span class="hier-arrow">›</span>
+              <span class="hier-node current">Country</span><span class="hier-arrow">›</span>
+              <span class="hier-node">State</span><span class="hier-arrow">›</span>
+              <span class="hier-node">City</span><span class="hier-arrow">›</span>
+              <span class="hier-node">Lat/Lng</span>
+            </div>
+            <div class="fields-in-dim">
+              <div class="fields-label">Mapped fields</div>
+              <span class="field-chip">country_code <span class="chip-source">Sales_Q4</span></span>
+              <span class="field-chip">shipping_city <span class="chip-source">Sales_Q4</span></span>
+              <span class="field-chip">customer_region <span class="chip-source">Customer</span></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- PRODUCT -->
+        <div class="dim-card custom" onclick="toggleDim(this)">
+          <div class="dim-card-head">
+            <div class="dim-icon">📦</div>
+            <div class="dim-info">
+              <div class="dim-name">Product</div>
+              <div class="dim-sub">Custom · Company taxonomy</div>
+            </div>
+            <div class="dim-count">8 fields<br><span style="color:var(--yellow)">88% conf.</span></div>
+          </div>
+          <div class="dim-card-body">
+            <div class="hierarchy-chain">
+              <span class="hier-node">Division</span><span class="hier-arrow">›</span>
+              <span class="hier-node current">Category</span><span class="hier-arrow">›</span>
+              <span class="hier-node">Subcategory</span><span class="hier-arrow">›</span>
+              <span class="hier-node">SKU</span>
+            </div>
+            <div class="fields-in-dim">
+              <div class="fields-label">Mapped fields</div>
+              <span class="field-chip">product_category <span class="chip-source">Sales_Q4</span></span>
+              <span class="field-chip">item_sku <span class="chip-source">inventory_log</span></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- CUSTOMER SEGMENT -->
+        <div class="dim-card custom" onclick="toggleDim(this)">
+          <div class="dim-card-head">
+            <div class="dim-icon">👤</div>
+            <div class="dim-info">
+              <div class="dim-name">Customer Segment</div>
+              <div class="dim-sub">Custom · Proposed by AI</div>
+            </div>
+            <div class="dim-count">5 fields<br><span style="color:var(--yellow)">81% conf.</span></div>
+          </div>
+          <div class="dim-card-body">
+            <div style="font-size:10px;color:var(--accent);padding:8px 0;border-bottom:1px solid var(--bone);margin-bottom:8px;">
+              ⚠ AI proposed this taxonomy — review & confirm
+            </div>
+            <div class="hierarchy-chain">
+              <span class="hier-node current">Tier</span><span class="hier-arrow">›</span>
+              <span class="hier-node">Segment</span><span class="hier-arrow">›</span>
+              <span class="hier-node">Account</span>
+            </div>
+            <div class="fields-in-dim">
+              <div class="fields-label">Mapped fields</div>
+              <span class="field-chip">customer_tier <span class="chip-source">Customer</span></span>
+              <span class="field-chip">account_type <span class="chip-source">Sales_Q4</span></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- MEASURES -->
+        <div class="dim-card measure" onclick="toggleDim(this)">
+          <div class="dim-card-head">
+            <div class="dim-icon">∑</div>
+            <div class="dim-info">
+              <div class="dim-name">Measures</div>
+              <div class="dim-sub">Numeric · 4 sources</div>
+            </div>
+            <div class="dim-count">22 fields<br><span style="color:var(--tag-measure)">99% conf.</span></div>
+          </div>
+          <div class="dim-card-body">
+            <div class="fields-in-dim">
+              <div class="fields-label">Available measures</div>
+              <span class="field-chip">revenue <span class="chip-source">Sales_Q4</span></span>
+              <span class="field-chip">units_sold <span class="chip-source">Sales_Q4</span></span>
+              <span class="field-chip">event_count <span class="chip-source">product_events</span></span>
+              <span class="field-chip">stock_qty <span class="chip-source">inventory_log</span></span>
+              <span class="field-chip">avg_order_val <span class="chip-source">Sales_Q4</span></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ADD DIMENSION -->
+        <div class="dim-card" style="display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;min-height:80px;border-style:dashed;cursor:pointer;" onclick="">
+          <div style="font-size:22px;color:var(--muted)">+</div>
+          <div style="font-size:10px;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase">Add dimension</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ STAGE 3: CONNECT ═══════════════════════════ -->
+    <div class="stage" id="stage3">
+      <div class="connect-legend fade-in">
+        <span><span class="legend-dot" style="background:var(--accent)"></span> Linked</span>
+        <span><span class="legend-dot" style="background:var(--bone);border:1px solid var(--muted)"></span> Unlinked</span>
+        <span style="margin-left:auto; color:var(--accent)">12 / 27 fields connected</span>
+      </div>
+
+      <div class="connect-layout fade-in">
+        <!-- Source fields -->
+        <div class="connect-col">
+          <div class="panel-head">
+            <strong>Source Fields</strong>
+            <span>All sources · 27 fields</span>
+          </div>
+          <div id="sourceFieldsList">
+            <div class="map-row linked" onclick="toggleLink(this)"><div class="field-chip" style="margin:0">order_quarter</div><div style="flex:1"></div><span class="map-source-tag">Sales_Q4</span><span class="link-indicator">linked</span></div>
+            <div class="map-row linked" onclick="toggleLink(this)"><div class="field-chip" style="margin:0">country_code</div><div style="flex:1"></div><span class="map-source-tag">Sales_Q4</span><span class="link-indicator">linked</span></div>
+            <div class="map-row linked" onclick="toggleLink(this)"><div class="field-chip" style="margin:0">product_category</div><div style="flex:1"></div><span class="map-source-tag">Sales_Q4</span><span class="link-indicator">linked</span></div>
+            <div class="map-row linked" onclick="toggleLink(this)"><div class="field-chip" style="margin:0">revenue</div><div style="flex:1"></div><span class="map-source-tag">Sales_Q4</span><span class="link-indicator">linked</span></div>
+            <div class="map-row" onclick="toggleLink(this)"><div class="field-chip" style="margin:0">rep_name</div><div style="flex:1"></div><span class="map-source-tag">Sales_Q4</span><span class="link-indicator">linked</span></div>
+            <div class="map-row linked" onclick="toggleLink(this)"><div class="field-chip" style="margin:0">event_date</div><div style="flex:1"></div><span class="map-source-tag">product_events</span><span class="link-indicator">linked</span></div>
+            <div class="map-row linked" onclick="toggleLink(this)"><div class="field-chip" style="margin:0">event_type</div><div style="flex:1"></div><span class="map-source-tag">product_events</span><span class="link-indicator">linked</span></div>
+            <div class="map-row" onclick="toggleLink(this)"><div class="field-chip" style="margin:0">session_id</div><div style="flex:1"></div><span class="map-source-tag">product_events</span><span class="link-indicator">linked</span></div>
+            <div class="map-row linked" onclick="toggleLink(this)"><div class="field-chip" style="margin:0">customer_tier</div><div style="flex:1"></div><span class="map-source-tag">Customer</span><span class="link-indicator">linked</span></div>
+            <div class="map-row linked" onclick="toggleLink(this)"><div class="field-chip" style="margin:0">customer_region</div><div style="flex:1"></div><span class="map-source-tag">Customer</span><span class="link-indicator">linked</span></div>
+            <div class="map-row" onclick="toggleLink(this)"><div class="field-chip" style="margin:0">contact_email</div><div style="flex:1"></div><span class="map-source-tag">Customer</span><span class="link-indicator">linked</span></div>
+            <div class="map-row linked" onclick="toggleLink(this)"><div class="field-chip" style="margin:0">item_sku</div><div style="flex:1"></div><span class="map-source-tag">inventory_log</span><span class="link-indicator">linked</span></div>
+            <div class="map-row linked" onclick="toggleLink(this)"><div class="field-chip" style="margin:0">stock_qty</div><div style="flex:1"></div><span class="map-source-tag">inventory_log</span><span class="link-indicator">linked</span></div>
+          </div>
+        </div>
+
+        <!-- Middle connector -->
+        <div class="connect-mid">
+          <div style="font-size:9px;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;writing-mode:vertical-rl;transform:rotate(180deg);margin-bottom:10px;">mapping</div>
+        </div>
+
+        <!-- Taxonomy dimensions -->
+        <div class="connect-col">
+          <div class="panel-head">
+            <strong>Taxonomy Dimensions</strong>
+            <span>5 dimensions</span>
+          </div>
+          <div class="map-row linked" style="background:#fdeee9"><div class="type-badge type-time">⏱ Time</div><div style="flex:1"></div><span style="font-size:10px;color:var(--muted)">Year › Quarter</span></div>
+          <div class="map-row linked" style="background:#fdeee9"><div class="type-badge type-time">⏱ Time</div><div style="flex:1"></div><span style="font-size:10px;color:var(--muted)">event_date</span></div>
+          <div class="map-row linked" style="background:#e8eef6"><div class="type-badge type-dimension">◈ Geography</div><div style="flex:1"></div><span style="font-size:10px;color:var(--muted)">Country level</span></div>
+          <div class="map-row linked" style="background:#e8eef6"><div class="type-badge type-dimension">◈ Geography</div><div style="flex:1"></div><span style="font-size:10px;color:var(--muted)">Region level</span></div>
+          <div class="map-row linked" style="background:#fef9ec"><div class="type-badge" style="background:#fef9ec;color:var(--yellow);border-color:#e8d898">◈ Product</div><div style="flex:1"></div><span style="font-size:10px;color:var(--muted)">Category</span></div>
+          <div class="map-row linked" style="background:#fef9ec"><div class="type-badge" style="background:#fef9ec;color:var(--yellow);border-color:#e8d898">◈ Product</div><div style="flex:1"></div><span style="font-size:10px;color:var(--muted)">SKU</span></div>
+          <div class="map-row linked" style="background:#fef9ec"><div class="type-badge" style="background:#fef9ec;color:var(--yellow);border-color:#e8d898">◈ Customer</div><div style="flex:1"></div><span style="font-size:10px;color:var(--muted)">Tier</span></div>
+          <div class="map-row" ><div class="type-badge" style="background:#fef9ec;color:var(--yellow);border-color:#e8d898">◈ Customer</div><div style="flex:1"></div><span style="font-size:10px;color:var(--muted)">Segment</span></div>
+          <div class="map-row linked" style="background:#e8f4ee"><div class="type-badge type-measure">∑ Revenue</div><div style="flex:1"></div><span style="font-size:10px;color:var(--muted)">numeric</span></div>
+          <div class="map-row linked" style="background:#e8f4ee"><div class="type-badge type-measure">∑ Stock Qty</div><div style="flex:1"></div><span style="font-size:10px;color:var(--muted)">numeric</span></div>
+          <div class="map-row linked" style="background:#e8f4ee"><div class="type-badge type-measure">∑ Event Count</div><div style="flex:1"></div><span style="font-size:10px;color:var(--muted)">numeric</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ STAGE 4: EXPORT ════════════════════════════ -->
+    <div class="stage" id="stage4">
+      <div class="export-grid fade-in">
+        <div class="export-card selected" onclick="selectExport(this)">
+          <div class="export-icon">📄</div>
+          <div class="export-name">CSV File</div>
+          <div class="export-desc">Flat file export with all mapped fields and taxonomy labels applied</div>
+        </div>
+        <div class="export-card" onclick="selectExport(this)">
+          <div class="export-icon">📊</div>
+          <div class="export-name">Excel Workbook</div>
+          <div class="export-desc">Multi-sheet export — one sheet per dimension with hierarchy levels</div>
+        </div>
+        <div class="export-card" onclick="selectExport(this)">
+          <div class="export-icon">🗄</div>
+          <div class="export-name">Database</div>
+          <div class="export-desc">Push directly to PostgreSQL, BigQuery, Snowflake, or MySQL</div>
+        </div>
+        <div class="export-card" onclick="selectExport(this)">
+          <div class="export-icon">🔗</div>
+          <div class="export-name">REST API</div>
+          <div class="export-desc">Expose taxonomy as a live JSON endpoint for BI tools</div>
+        </div>
+        <div class="export-card" onclick="selectExport(this)">
+          <div class="export-icon">📐</div>
+          <div class="export-name">Tableau / Power BI</div>
+          <div class="export-desc">Export as a data source with pre-built dimension hierarchies</div>
+        </div>
+        <div class="export-card" onclick="selectExport(this)">
+          <div class="export-icon">🧩</div>
+          <div class="export-name">JSON Schema</div>
+          <div class="export-desc">Export the taxonomy definition itself for use in other systems</div>
+        </div>
+      </div>
+
+      <div class="export-config fade-in">
+        <div class="panel-head" style="padding:12px 16px;"><strong>Export Configuration</strong></div>
+        <div style="padding:16px;">
+          <div class="config-row">
+            <div class="config-label">File name</div>
+            <input class="config-input" type="text" value="taxonomy_export_2025_03" />
+          </div>
+          <div class="config-row">
+            <div class="config-label">Include measures</div>
+            <select class="config-select">
+              <option>Yes — all measures</option>
+              <option>Only mapped measures</option>
+              <option>No measures</option>
+            </select>
+          </div>
+          <div class="config-row">
+            <div class="config-label">Hierarchy depth</div>
+            <select class="config-select">
+              <option>Full hierarchy (all levels)</option>
+              <option>Detected atomic level only</option>
+              <option>Custom…</option>
+            </select>
+          </div>
+          <div class="config-row">
+            <div class="config-label">Null handling</div>
+            <select class="config-select">
+              <option>Keep as NULL</option>
+              <option>Replace with "Unknown"</option>
+              <option>Drop rows</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px;justify-content:flex-end;" class="fade-in">
+        <button class="btn">Preview Export</button>
+        <button class="btn btn-green">⬇ Download</button>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<script>
+// ── DATA ──────────────────────────────────────────────
+const sourcesData = {
+  sales: {
+    title: 'Sales_Q4_2024.csv — Fields',
+    meta: '12 fields',
+    fields: [
+      { name: 'order_quarter', type: 'time', sample: 'Q1 2024, Q2 2024' },
+      { name: 'country_code', type: 'dimension', sample: 'US, DE, BR' },
+      { name: 'product_category', type: 'dimension', sample: 'Electronics, Apparel' },
+      { name: 'account_type', type: 'dimension', sample: 'Enterprise, SMB' },
+      { name: 'shipping_city', type: 'dimension', sample: 'New York, Berlin' },
+      { name: 'revenue', type: 'measure', sample: '12400, 8900, 24100' },
+      { name: 'units_sold', type: 'measure', sample: '14, 3, 82' },
+      { name: 'avg_order_val', type: 'measure', sample: '886, 2967' },
+      { name: 'discount_pct', type: 'measure', sample: '0.05, 0.15' },
+      { name: 'rep_id', type: 'unknown', sample: 'REP-001, REP-002' },
+      { name: 'order_id', type: 'unknown', sample: 'ORD-8821, ORD-8822' },
+      { name: 'notes', type: 'unknown', sample: 'Expedited, —' },
+    ]
+  },
+  product: {
+    title: 'product_events — Fields',
+    meta: '8 fields',
+    fields: [
+      { name: 'event_date', type: 'time', sample: '2024-10-14, 2024-11-02' },
+      { name: 'event_type', type: 'dimension', sample: 'click, signup, purchase' },
+      { name: 'device_type', type: 'dimension', sample: 'mobile, desktop' },
+      { name: 'event_count', type: 'measure', sample: '1200, 400, 78' },
+      { name: 'session_duration', type: 'measure', sample: '120, 340' },
+      { name: 'session_id', type: 'unknown', sample: 'sess_9a3f, sess_1b2c' },
+      { name: 'user_id', type: 'unknown', sample: 'usr_001, usr_002' },
+      { name: 'ab_variant', type: 'dimension', sample: 'A, B, Control' },
+    ]
+  },
+  customer: {
+    title: 'Customer_Master.xlsx — Fields',
+    meta: '31 fields',
+    fields: [
+      { name: 'signup_date', type: 'time', sample: '2022-03-12, 2023-08-01' },
+      { name: 'customer_tier', type: 'dimension', sample: 'Gold, Silver, Bronze' },
+      { name: 'customer_region', type: 'dimension', sample: 'EMEA, APAC, AMER' },
+      { name: 'industry', type: 'dimension', sample: 'Finance, Tech, Retail' },
+      { name: 'lifetime_value', type: 'measure', sample: '45000, 12000' },
+      { name: 'contact_email', type: 'unknown', sample: 'j.doe@corp.com' },
+    ]
+  },
+  inventory: {
+    title: 'inventory_log — Fields',
+    meta: '7 fields · 3 pending',
+    fields: [
+      { name: 'log_date', type: 'time', sample: '2024-12-01, 2024-12-02' },
+      { name: 'item_sku', type: 'dimension', sample: 'SKU-001, SKU-882' },
+      { name: 'warehouse_zone', type: 'unknown', sample: 'A3, B1, C7' },
+      { name: 'stock_qty', type: 'measure', sample: '400, 12, 0' },
+      { name: 'reorder_flag', type: 'unknown', sample: 'Y, N' },
+      { name: 'supplier_code', type: 'unknown', sample: 'SUP-01, SUP-04' },
+      { name: 'cost_per_unit', type: 'measure', sample: '12.40, 88.00' },
+    ]
+  }
+};
+
+const typeLabels = { time: '⏱ Time', dimension: '◈ Dimension', measure: '∑ Measure', unknown: '? Unknown' };
+const typeCss = { time: 'type-time', dimension: 'type-dimension', measure: 'type-measure', unknown: 'type-unknown' };
+
+function renderFields(sourceKey) {
+  const data = sourcesData[sourceKey];
+  document.getElementById('fieldPanelTitle').textContent = data.title;
+  document.getElementById('fieldPanelMeta').textContent = data.meta;
+  const tbody = document.getElementById('fieldTableBody');
+  tbody.innerHTML = '';
+  data.fields.forEach(f => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${f.name}</td>
+      <td><span class="type-badge ${typeCss[f.type]}" onclick="cycleType(this)">${typeLabels[f.type]}</span></td>
+      <td><span class="sample-val">${f.sample}</span></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+const typeOrder = ['time','dimension','measure','unknown'];
+function cycleType(el) {
+  const current = Object.keys(typeCss).find(k => el.classList.contains(typeCss[k]));
+  const next = typeOrder[(typeOrder.indexOf(current) + 1) % typeOrder.length];
+  el.className = 'type-badge ' + typeCss[next];
+  el.textContent = typeLabels[next];
+}
+
+function selectSource(row, sourceKey) {
+  document.querySelectorAll('.source-row').forEach(r => r.classList.remove('selected'));
+  row.classList.add('selected');
+  renderFields(sourceKey);
+}
+
+// Init
+renderFields('sales');
+
+// ── STAGE NAVIGATION ─────────────────────────────────
+let currentStage = 2;
+
+const stageMeta = {
+  1: { title: '01 — Ingest Data', sub: '4 sources connected · 89 fields', sec: 'Add Source', pri: 'Continue →', progress: '25%' },
+  2: { title: '02 — Dimensions', sub: 'AI-classified · 5 distinct dimensions found', sec: 'Review All', pri: 'Continue →', progress: '50%' },
+  3: { title: '03 — Connect', sub: 'Link source fields to taxonomy dimensions', sec: 'Auto-map All', pri: 'Continue →', progress: '75%' },
+  4: { title: '04 — Export', sub: 'Ready to export your unified taxonomy', sec: 'Preview', pri: '⬇ Export', progress: '100%' },
+};
+
+function setStage(n) {
+  currentStage = n;
+  document.querySelectorAll('.stage').forEach(s => s.classList.remove('active'));
+  document.getElementById('stage' + n).classList.add('active');
+
+  document.querySelectorAll('.nav-item[data-stage]').forEach(item => {
+    item.classList.remove('active');
+    if (parseInt(item.dataset.stage) === n) item.classList.add('active');
+  });
+
+  const m = stageMeta[n];
+  document.getElementById('topbarTitle').textContent = m.title;
+  document.getElementById('topbarSub').textContent = m.sub;
+  document.getElementById('topbarSecBtn').textContent = m.sec;
+  document.getElementById('topbarPriBtn').textContent = m.pri;
+  document.getElementById('progressFill').style.width = m.progress;
+}
+
+function nextStage() {
+  if (currentStage < 4) setStage(currentStage + 1);
+}
+
+function topbarSecAction() { /* stub */ }
+
+// ── DIM TOGGLE ───────────────────────────────────────
+function toggleDim(card) {
+  const wasExpanded = card.classList.contains('expanded');
+  document.querySelectorAll('.dim-card').forEach(c => c.classList.remove('expanded'));
+  if (!wasExpanded) card.classList.add('expanded');
+}
+
+// ── CONNECT ──────────────────────────────────────────
+function toggleLink(row) {
+  row.classList.toggle('linked');
+  const ind = row.querySelector('.link-indicator');
+  if (ind) ind.style.display = row.classList.contains('linked') ? 'inline' : 'none';
+  updateLinkCount();
+}
+
+function updateLinkCount() {
+  const total = document.querySelectorAll('#sourceFieldsList .map-row').length;
+  const linked = document.querySelectorAll('#sourceFieldsList .map-row.linked').length;
+  document.querySelector('.connect-legend span:last-child').textContent = linked + ' / ' + total + ' fields connected';
+}
+
+// ── EXPORT ───────────────────────────────────────────
+function selectExport(card) {
+  document.querySelectorAll('.export-card').forEach(c => c.classList.remove('selected'));
+  card.classList.add('selected');
+}
+</script>
+</body>
+</html>

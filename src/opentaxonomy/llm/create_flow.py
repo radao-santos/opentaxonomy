@@ -52,7 +52,7 @@ from .schemas import (
 
 console = Console()
 
-_NORMALIZE_BATCH = 150
+_NORMALIZE_BATCH = 50
 _PLACEMENT_BATCH = 50
 
 

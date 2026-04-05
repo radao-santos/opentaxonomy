@@ -21,7 +21,7 @@ from .schemas import NormalizationResult, NormalizedEntity, PlacementResult
 
 console = Console()
 
-_NORMALIZE_BATCH = 150
+_NORMALIZE_BATCH = 50
 _PLACEMENT_BATCH = 50
 
 
@@ -144,7 +144,7 @@ class RunFlow:
 
     def _normalize(self, raw_values: list[str]) -> list[NormalizedEntity]:
         from collections import defaultdict as dd
-        merged: dict[str, list[str]] = dd(list)
+        merged: dict[str, dict] = dd(lambda: {"raws": [], "definition": ""})
         for i in range(0, len(raw_values), _NORMALIZE_BATCH):
             batch = raw_values[i : i + _NORMALIZE_BATCH]
             result = self.llm.complete(
@@ -154,9 +154,11 @@ class RunFlow:
                 max_tokens=8096,
             )
             for e in result.entities:
-                merged[e.normalized].extend(e.raw_samples)
-        return [NormalizedEntity(normalized=n, raw_samples=list(dict.fromkeys(r)))
-                for n, r in merged.items()]
+                merged[e.normalized]["raws"].extend(e.raw_samples)
+                if not merged[e.normalized]["definition"]:
+                    merged[e.normalized]["definition"] = e.definition
+        return [NormalizedEntity(normalized=n, definition=data["definition"], raw_samples=list(dict.fromkeys(data["raws"])))
+                for n, data in merged.items()]
 
     def _append_raw_samples(
         self,
