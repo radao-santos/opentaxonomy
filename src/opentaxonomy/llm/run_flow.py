@@ -96,8 +96,9 @@ class RunFlow:
 
         # Place new normalized values in batches
         new_normalized = [e.normalized for e in new_entities]
-        raw_by_norm = {e.normalized: e.raw_samples for e in new_entities}
-        def_by_norm = {e.normalized: e.definition for e in new_entities}
+        # Case-insensitive lookups — the placement LLM may echo strings
+        # back with different capitalisation, so exact-key matching fails.
+        entity_by_lower = {e.normalized.lower().strip(): e for e in new_entities}
 
         all_placed: list = []
         all_unresolved: list = []
@@ -119,10 +120,11 @@ class RunFlow:
         # Update placement map with new placements
         by_cid: dict[str, list[PlacementEntity]] = defaultdict(list)
         for placed in all_placed:
+            source = entity_by_lower.get(placed.normalized.lower().strip())
             entity = PlacementEntity(
-                normalized=placed.normalized,
-                definition=def_by_norm.get(placed.normalized),
-                raw_samples=raw_by_norm.get(placed.normalized, [placed.normalized]),
+                normalized=source.normalized if source else placed.normalized,
+                definition=source.definition if source else None,
+                raw_samples=source.raw_samples if source else [placed.normalized],
             )
             by_cid[placed.canonical_id].append(entity)
             # Update lookup tables
