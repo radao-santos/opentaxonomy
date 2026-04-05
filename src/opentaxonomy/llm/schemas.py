@@ -14,6 +14,7 @@ from ..taxonomy.models import EdgeCase, DecisionRecord
 
 class NormalizedEntity(BaseModel):
     normalized: str
+    definition: str
     raw_samples: list[str]
 
 

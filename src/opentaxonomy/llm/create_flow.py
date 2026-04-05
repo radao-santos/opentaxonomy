@@ -93,7 +93,8 @@ class CreateFlow:
         entities = self._normalize(raw_values, domain_hint)
         normalized_unique = [e.normalized for e in entities]
         raw_by_norm: dict[str, list[str]] = {e.normalized: e.raw_samples for e in entities}
-        console.print(f"  {len(raw_values)} raw → {len(normalized_unique)} normalized entities")
+        def_by_norm: dict[str, str] = {e.normalized: e.definition for e in entities}
+        console.print(f"  {len(raw_values)} raw -> {len(normalized_unique)} normalized entities")
 
         # Q0 + Q0b: Foundation
         console.print("[bold blue]Q0/Q0b:[/] Identifying form and context…")
@@ -182,7 +183,7 @@ class CreateFlow:
         # Assemble outputs
         seed = _build_seed(foundation, root, all_nodes)
         nodes = _build_output_nodes(all_nodes)
-        placement_map = _build_placement_map(all_nodes, raw_by_norm, foundation.seed_id, prefix)
+        placement_map = _build_placement_map(all_nodes, raw_by_norm, def_by_norm, foundation.seed_id, prefix)
         placement_map.unresolved.extend(q3_unresolved)
 
         return seed, nodes, placement_map
@@ -312,6 +313,7 @@ def _tree_summary(nodes: list[_Node]) -> str:
 def _build_placement_map(
     nodes: list[_Node],
     raw_by_norm: dict[str, list[str]],
+    def_by_norm: dict[str, str],
     seed_id: str,
     prefix: str,
 ) -> PlacementMap:
@@ -321,6 +323,7 @@ def _build_placement_map(
         for member in node.members:
             entity = PlacementEntity(
                 normalized=member,
+                definition=def_by_norm.get(member),
                 raw_samples=raw_by_norm.get(member, [member]),
             )
             by_cid[node.canonical_id].append(entity)

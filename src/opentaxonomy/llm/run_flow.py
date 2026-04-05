@@ -95,6 +95,7 @@ class RunFlow:
         # Place new normalized values in batches
         new_normalized = [e.normalized for e in new_entities]
         raw_by_norm = {e.normalized: e.raw_samples for e in new_entities}
+        def_by_norm = {e.normalized: e.definition for e in new_entities}
 
         all_placed: list = []
         all_unresolved: list = []
@@ -115,6 +116,7 @@ class RunFlow:
         for placed in all_placed:
             entity = PlacementEntity(
                 normalized=placed.normalized,
+                definition=def_by_norm.get(placed.normalized),
                 raw_samples=raw_by_norm.get(placed.normalized, [placed.normalized]),
             )
             by_cid[placed.canonical_id].append(entity)

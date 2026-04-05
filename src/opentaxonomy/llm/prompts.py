@@ -31,11 +31,17 @@ def normalize_prompt(raw_values: list[str], domain_hint: str = "") -> str:
     return f"""\
 Apply Step 0 of the Prima Seed protocol: normalize these raw values.{hint}
 
-For each raw value:
+For each entity:
 1. Strip metadata — dates, amounts, IBANs, reference numbers, transaction codes
 2. Resolve encoding artifacts and spelling variants
-3. Extract the core entity name (merchant, person, category, etc.)
+3. Extract the core entity name (merchant, product, person, category, etc.)
 4. Group raw values that refer to the same entity under one normalized name
+5. Write a definition: 1-2 sentences describing WHAT this entity IS — not what category it belongs to,
+   but what it fundamentally is. Examples:
+   - "Butter Croissant" → "A flaky, layered pastry made with butter, typically eaten as a breakfast item or snack."
+   - "Clean Wipes" → "Disposable pre-moistened cloths used for cleaning surfaces or personal hygiene."
+   - "REWE" → "A major German supermarket chain selling food, beverages, and household goods."
+   - "Netflix" → "A subscription-based video streaming platform offering films and TV series."
 
 Raw values:
 {values_str}
