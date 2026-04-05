@@ -184,3 +184,60 @@ For each value:
 - List the raw_samples (use the normalized value itself if you have no other raw form)
 - If genuinely unresolvable, flag it with a reason
 """
+
+
+def tree_fit_prompt(values: list[str], node_label: str, node_canonical_id: str, context: str, children: list[dict]) -> str:
+    values_str = "\n".join(f"  - {v}" for v in values)
+    children_str = "\n".join(
+        f"  - {c['canonical_id']} | {c['label']} | Q: {c['question']} | Includes: {', '.join(c['includes'][:2])}"
+        for c in children
+    )
+    return f"""\
+You are traversing a taxonomy tree to find where new values should be grafted.
+
+Context: {context}
+Current node: {node_label} ({node_canonical_id})
+
+Existing child branches:
+{children_str}
+
+Values to classify:
+{values_str}
+
+For each value, decide:
+- If it clearly fits under one of the existing children: return that child's canonical_id
+- If it does not fit any existing child: return null (a new branch is needed here)
+
+Be strict — only return a matching_canonical_id if the value genuinely belongs under that branch's criteria.
+"""
+
+
+def graft_prompt(values: list[str], parent_label: str, parent_question: str, parent_includes: list[str], context: str) -> str:
+    values_str = "\n".join(f"  - {v}" for v in values)
+    includes_str = "\n".join(f"  - {inc}" for inc in parent_includes)
+    return f"""\
+New values have arrived that do not fit any existing branch under "{parent_label}".
+
+Context: {context}
+Parent node: {parent_label}
+Parent criterion: {parent_question}
+Parent includes:
+{includes_str}
+
+Values to classify:
+{values_str}
+
+Create the minimum number of new branches needed to place all these values.
+Group related values together — don't create one branch per value.
+
+For each branch:
+- key: short slug (no spaces)
+- label: human-readable name
+- question: yes/no placement question (specific, unambiguous)
+- criteria_includes: what belongs here
+- criteria_excludes: what does NOT belong here
+- members: which of the above values go here
+- edge_cases: any boundary cases worth noting
+
+If a value truly cannot be classified even in a new branch, put it in unplaced.
+"""

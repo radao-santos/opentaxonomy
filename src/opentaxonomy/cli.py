@@ -1,6 +1,7 @@
 import click
 
 from .commands.create import run_create
+from .commands.expand import run_expand
 from .commands.run import run_run
 
 
@@ -102,4 +103,35 @@ def run(input_source, column, seed_dir, api_key, model, db_table, sheet):
         model=model,
         db_table=db_table,
         sheet=_parse_sheet(sheet),
+    )
+
+
+@main.command()
+@click.option("--seed-dir", "-s", default="./taxonomy", show_default=True,
+              help="Directory containing seed.yaml, nodes/, and placement_map.yaml")
+@click.option("--api-key", envvar="ANTHROPIC_API_KEY", default=None,
+              help="Anthropic API key (or set ANTHROPIC_API_KEY env var)")
+@click.option("--model", default="claude-sonnet-4-6", show_default=True,
+              help="Claude model to use")
+@click.option("--max-retries", default=2, show_default=True,
+              help="Max graft attempts before routing to the Other bucket")
+def expand(seed_dir, api_key, model, max_retries):
+    """Graft new branches to cover unresolved values.
+
+    \b
+    Reads unresolved values from placement_map.yaml, then:
+      1. Traverses the existing tree to find where each value fits
+      2. Creates new branches at the right level (vertical or horizontal growth)
+      3. After --max-retries failed attempts, routes remaining to {prefix}.other
+    Updates seed.yaml, nodes/, and placement_map.yaml in place.
+    """
+    if not api_key:
+        raise click.UsageError(
+            "Anthropic API key required. Set ANTHROPIC_API_KEY or use --api-key."
+        )
+    run_expand(
+        seed_dir=seed_dir,
+        api_key=api_key,
+        model=model,
+        max_retries=max_retries,
     )

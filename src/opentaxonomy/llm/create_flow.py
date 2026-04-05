@@ -202,12 +202,14 @@ class CreateFlow:
             )
             all_entities.extend(result.entities)
         # Merge duplicate normalized names
-        merged: dict[str, list[str]] = defaultdict(list)
+        merged: dict[str, dict] = defaultdict(lambda: {"raws": [], "definition": ""})
         for e in all_entities:
-            merged[e.normalized].extend(e.raw_samples)
+            merged[e.normalized]["raws"].extend(e.raw_samples)
+            if not merged[e.normalized]["definition"]:
+                merged[e.normalized]["definition"] = e.definition
         from .schemas import NormalizedEntity
-        return [NormalizedEntity(normalized=norm, raw_samples=list(dict.fromkeys(raws)))
-                for norm, raws in merged.items()]
+        return [NormalizedEntity(normalized=norm, definition=data["definition"], raw_samples=list(dict.fromkeys(data["raws"])))
+                for norm, data in merged.items()]
 
     def _foundation(self, normalized: list[str]) -> FoundationResult:
         return self.llm.complete(

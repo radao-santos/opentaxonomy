@@ -74,6 +74,33 @@ class NodeDetailResult(BaseModel):
     decision_record: Optional[DecisionRecord] = None
 
 
+# ── Tree traversal (expand) ───────────────────────────────────────────────────
+
+class ValueFit(BaseModel):
+    value: str
+    matching_canonical_id: Optional[str]  # None = doesn't fit any existing child
+    reasoning: str
+
+
+class TreeFitResult(BaseModel):
+    fits: list[ValueFit]
+
+
+class GraftBranch(BaseModel):
+    key: str
+    label: str
+    question: str
+    criteria_includes: list[str]
+    criteria_excludes: list[str]
+    members: list[str]
+    edge_cases: list[EdgeCase] = []
+
+
+class GraftResult(BaseModel):
+    branches: list[GraftBranch]
+    unplaced: list[str] = []
+
+
 # ── Placement ─────────────────────────────────────────────────────────────────
 
 class PlacedValue(BaseModel):
