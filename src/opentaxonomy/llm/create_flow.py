@@ -10,6 +10,7 @@ CreateFlow — executes the full Prima Seed protocol:
 """
 from __future__ import annotations
 
+import time
 from collections import defaultdict
 from dataclasses import dataclass, field
 from datetime import date
@@ -54,6 +55,7 @@ console = Console()
 
 _NORMALIZE_BATCH = 50
 _PLACEMENT_BATCH = 50
+_BATCH_SLEEP = 15  # seconds between batches to stay under API rate limits
 
 
 # ── Internal tree node ────────────────────────────────────────────────────────
@@ -193,6 +195,8 @@ class CreateFlow:
     def _normalize(self, raw_values: list[str], domain_hint: str) -> list:
         all_entities = []
         for i in range(0, len(raw_values), _NORMALIZE_BATCH):
+            if i > 0:
+                time.sleep(_BATCH_SLEEP)
             batch = raw_values[i : i + _NORMALIZE_BATCH]
             result = self.llm.complete(
                 NormalizationResult,

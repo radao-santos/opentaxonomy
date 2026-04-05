@@ -8,6 +8,7 @@ RunFlow — places new/unseen values into an existing taxonomy.
 """
 from __future__ import annotations
 
+import time
 from collections import defaultdict
 from pathlib import Path
 
@@ -23,6 +24,7 @@ console = Console()
 
 _NORMALIZE_BATCH = 50
 _PLACEMENT_BATCH = 50
+_BATCH_SLEEP = 15  # seconds between batches to stay under API rate limits
 
 
 class RunFlow:
@@ -101,6 +103,9 @@ class RunFlow:
         all_unresolved: list = []
 
         for i in range(0, len(new_normalized), _PLACEMENT_BATCH):
+            if i > 0:
+                console.print(f"  [dim]Rate limit pause ({_BATCH_SLEEP}s)…[/]")
+                time.sleep(_BATCH_SLEEP)
             batch = new_normalized[i : i + _PLACEMENT_BATCH]
             result = self.llm.complete(
                 PlacementResult,
@@ -146,6 +151,8 @@ class RunFlow:
         from collections import defaultdict as dd
         merged: dict[str, dict] = dd(lambda: {"raws": [], "definition": ""})
         for i in range(0, len(raw_values), _NORMALIZE_BATCH):
+            if i > 0:
+                time.sleep(_BATCH_SLEEP)
             batch = raw_values[i : i + _NORMALIZE_BATCH]
             result = self.llm.complete(
                 NormalizationResult,
