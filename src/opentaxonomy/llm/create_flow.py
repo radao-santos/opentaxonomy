@@ -127,7 +127,13 @@ class CreateFlow:
 
         def expand(node: _Node, depth: int) -> None:
             all_nodes.append(node)
-            if depth >= self.max_depth or len(node.members) < self.min_branch_size:
+            if depth >= self.max_depth:
+                node.is_leaf = True
+                return
+
+            # Only skip LLM call if members is empty — not for small-but-non-empty branches,
+            # as those should still be asked to split (the DEPTH RULE in the prompt handles it).
+            if not node.members:
                 node.is_leaf = True
                 return
 
@@ -160,6 +166,11 @@ class CreateFlow:
 
         for l1_child in root.children:
             expand(l1_child, depth=2)
+
+        # Depth normalisation: pad any leaf shallower than the deepest leaf so that
+        # every branch terminates at the same level.
+        console.print("[bold blue]Depth:[/] Normalising tree depth…")
+        _pad_to_target_depth(all_nodes, self.max_depth)
 
         # Q3: Dialectical check — collect unplaced values across all leaf nodes
         leaf_nodes = [n for n in all_nodes if n.is_leaf or not n.children]
@@ -235,7 +246,7 @@ class CreateFlow:
         return self.llm.complete(
             RecursiveDiffResult,
             system=SYSTEM_PRIMA_SEED,
-            user=recursive_differentiation_prompt(label, members, context, depth),
+            user=recursive_differentiation_prompt(label, members, context, depth, self.max_depth),
             max_tokens=4096,
         )
 
@@ -289,6 +300,51 @@ class CreateFlow:
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
+
+def _node_depth(node: _Node) -> int:
+    """Depth = number of dots in canonical_id (root = 0, L1 = 1, ...)."""
+    return node.canonical_id.count(".")
+
+
+def _pad_to_target_depth(all_nodes: list[_Node], max_depth: int) -> None:
+    """Ensure every leaf sits at max_depth by inserting transparent 'General' nodes.
+
+    When a branch legitimately cannot be split further (e.g. a single entity),
+    we wrap it in a same-named child so the tree depth is uniform.  The child
+    inherits all members, question, and criteria from its parent — it is purely
+    a structural placeholder.
+    """
+    target = max_depth
+
+    # Iterate until stable (padding may create new shallow leaves)
+    changed = True
+    while changed:
+        changed = False
+        for node in list(all_nodes):
+            if not node.is_leaf:
+                continue
+            depth = _node_depth(node)
+            if depth >= target:
+                continue
+            # This leaf terminates too early — insert one 'general' child level
+            node.is_leaf = False
+            child_id = f"{node.canonical_id}.general"
+            child = _Node(
+                key="general",
+                label=node.label,          # same label — transparent wrapper
+                canonical_id=child_id,
+                parent_label=node.label,
+                members=list(node.members),
+                question=node.question,
+                criteria_includes=list(node.criteria_includes),
+                criteria_excludes=list(node.criteria_excludes),
+            )
+            child.is_leaf = _node_depth(child) >= target
+            node.members = []
+            node.children = [child]
+            all_nodes.append(child)
+            changed = True  # re-check: the new child may itself be too shallow
+
 
 def _build_child(b: BranchDef, parent: _Node) -> _Node:
     canonical_id = f"{parent.canonical_id}.{slugify(b.key)}"

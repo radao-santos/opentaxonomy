@@ -84,6 +84,15 @@ Normalized values:
 
 Q1: Within this context, what is the MOST ESSENTIAL criterion dividing these values into groups?
 
+ABSTRACTION RULE — this is mandatory:
+Every branch you produce must answer the SAME question at the SAME level of abstraction.
+If one branch is broad (e.g. "Animal-Derived Products"), ALL sibling branches must be equally broad.
+A specific sub-type (e.g. "Beer & Ales", "Frozen Desserts") cannot be a sibling of a broad category
+(e.g. "Food & Drink") — that specific type belongs INSIDE the broad category, not alongside it.
+If you find yourself creating one broad branch and several narrow ones, your criterion is wrong —
+choose a broader criterion that produces branches of consistent scope.
+Aim for 3–7 branches. Fewer broad branches are better than many specific ones.
+
 For each branch provide:
 - key              — short slug (no spaces, e.g. 'expenditure')
 - label            — human-readable name (e.g. 'Expenditure')
@@ -96,11 +105,12 @@ For each branch provide:
 
 
 def recursive_differentiation_prompt(
-    branch_label: str, members: list[str], context: str, depth: int
+    branch_label: str, members: list[str], context: str, depth: int, max_depth: int = 4
 ) -> str:
     members_str = "\n".join(f"  - {v}" for v in members)
+    levels_remaining = max_depth - depth
     return f"""\
-Apply Q2 of the Prima Seed protocol to this branch (depth {depth}).
+Apply Q2 of the Prima Seed protocol to this branch (depth {depth} of {max_depth}).
 
 Branch: {branch_label}
 Context: {context}
@@ -109,6 +119,25 @@ Members:
 {members_str}
 
 Q2: What is the next most essential criterion within this branch?
+
+ABSTRACTION RULE — this is mandatory:
+All sub-branches produced here must answer the SAME question at the SAME level of abstraction.
+A specific product type (e.g. "Cheddar Cheese") cannot be a sibling of a broad group
+(e.g. "Dairy Products") — the specific type belongs INSIDE the broad group.
+If your members are too similar to split meaningfully, return is_leaf=true rather than
+creating artificially fine-grained branches.
+Aim for 2–6 sub-branches of consistent scope.
+
+DEPTH RULE — this is mandatory:
+You are at depth {depth}. There {'is' if levels_remaining == 1 else 'are'} {levels_remaining} \
+level{'s' if levels_remaining != 1 else ''} remaining before the maximum depth.
+- If {levels_remaining} level{'s remain' if levels_remaining != 1 else ' remains'}: \
+{'you MUST split unless ALL members are truly identical and indistinguishable by any criterion.' if levels_remaining > 0 else 'return is_leaf=true.'}
+- Do NOT return is_leaf=true simply because there are few members — even 2 distinct values
+  can be split into 2 meaningful sub-branches.
+- A branch that returns is_leaf=true at depth {depth} will terminate earlier than its
+  siblings, producing an uneven tree. Only do this if there is genuinely no criterion
+  that separates the members in any meaningful way.
 
 If values are sufficiently similar that no meaningful split exists, return is_leaf=true.
 

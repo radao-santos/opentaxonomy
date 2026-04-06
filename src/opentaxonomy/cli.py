@@ -3,6 +3,7 @@ import click
 from .commands.create import run_create
 from .commands.expand import run_expand
 from .commands.run import run_run
+from .commands.test import run_test
 
 
 def _parse_sheet(sheet: str | None) -> str | int | None:
@@ -41,6 +42,8 @@ def main():
     Commands:
       create   Run the Prima Seed protocol to generate a new taxonomy from raw data.
       run      Place new/unseen values using an existing taxonomy seed.
+      expand   Graft new branches for unresolved values.
+      test     Build taxonomy from a sample, then validate with an agent placement loop.
     """
 
 
@@ -80,7 +83,18 @@ def create(input_source, column, output_dir, api_key, model, domain_hint, db_tab
 
 
 @main.command()
-@shared_options
+@click.option("--input", "-i", "input_source", required=True,
+              help="Input file path (csv/tsv/json/xlsx/parquet) or database connection string")
+@click.option("--column", "-c", required=True,
+              help="Column containing the raw values to classify")
+@click.option("--api-key", envvar="ANTHROPIC_API_KEY", default=None,
+              help="Anthropic API key (or set ANTHROPIC_API_KEY env var)")
+@click.option("--model", default="claude-haiku-4-5-20251001", show_default=True,
+              help="Claude model to use")
+@click.option("--db-table", default=None,
+              help="Table name (required when input is a database connection string)")
+@click.option("--sheet", default=None,
+              help="Sheet name or index for Excel files (default: first sheet)")
 @click.option("--seed-dir", "-s", default="./taxonomy", show_default=True,
               help="Directory containing seed.yaml, nodes/, and placement_map.yaml")
 def run(input_source, column, seed_dir, api_key, model, db_table, sheet):
@@ -134,4 +148,49 @@ def expand(seed_dir, api_key, model, max_retries):
         api_key=api_key,
         model=model,
         max_retries=max_retries,
+    )
+
+
+@main.command()
+@shared_options
+@click.option("--output-dir", "-o", default="./taxonomy-test", show_default=True,
+              help="Directory to write the test taxonomy (seed.yaml, nodes/, placement_map.yaml)")
+@click.option("--domain-hint", default="", show_default=False,
+              help="Optional hint about the data domain (e.g. 'German grocery products')")
+@click.option("--sample-size", "-n", default=100, show_default=True,
+              help="Number of unique values used to build the taxonomy")
+@click.option("--validate-size", "-v", default=200, show_default=True,
+              help="Number of held-out values to classify (0 = use all remaining)")
+@click.option("--seed", "seed_value", default=42, show_default=True,
+              help="Random seed for reproducible sample splits")
+def test(input_source, column, output_dir, api_key, model, domain_hint,
+         db_table, sheet, sample_size, validate_size, seed_value):
+    """Build a taxonomy from a sample, then validate via an agent placement loop.
+
+    \b
+    Workflow:
+      1. Sample --sample-size unique values -- run Prima Seed (Sonnet)
+      2. Write taxonomy to --output-dir
+      3. Spawn placement agents (Haiku, batches of 50) on --validate-size held-out values
+      4. Print quality report: placement rate + category distribution
+
+    Use this before running 'create' on the full dataset to sanity-check
+    that the taxonomy structure makes sense for your data.
+    """
+    if not api_key:
+        raise click.UsageError(
+            "Anthropic API key required. Set ANTHROPIC_API_KEY or use --api-key."
+        )
+    run_test(
+        input_source=input_source,
+        column=column,
+        output_dir=output_dir,
+        api_key=api_key,
+        model=model,
+        domain_hint=domain_hint,
+        db_table=db_table,
+        sheet=_parse_sheet(sheet),
+        sample_size=sample_size,
+        validate_size=validate_size,
+        seed_value=seed_value,
     )
