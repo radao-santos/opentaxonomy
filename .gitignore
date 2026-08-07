@@ -24,7 +24,7 @@ dist/
 .idea/
 
 # Taxonomy output (generated data — not source)
-taxonomy/
+/taxonomy/
 
 # Claude Code
 .claude/
